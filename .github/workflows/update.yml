@@ -1,0 +1,39 @@
+name: Update
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    paths:
+      - ".github/workflows/update.yml"
+
+jobs:
+  update:
+    name: Update theme
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: Set up Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: "0.92.0"
+          extended: true
+
+      - name: Run hugo mod get
+        run: hugo mod get -u
+
+      - name: Create PR for updated theme
+        uses: peter-evans/create-pull-request@v3
+        with:
+          base: main
+          branch: dependency/github.com/hapakaien/hugo-themes/basajan
+          add-paths: |
+            go.mod
+          author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          committer: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          commit-message: "chore: update basajan theme"
+          title: "chore: update basajan theme"
+          delete-branch: true
